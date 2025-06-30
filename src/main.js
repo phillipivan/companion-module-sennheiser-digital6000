@@ -57,6 +57,7 @@ class Digital6000 extends InstanceBase {
 
 	async configUpdated(config) {
 		this.config = config
+		process.title = this.label
 		this.stopFeedbackChecks()
 		this.config.host = config.bonjour_host?.split(':')[0] || config.host
 		this.config.port = config.bonjour_host?.split(':')[1] || config.port

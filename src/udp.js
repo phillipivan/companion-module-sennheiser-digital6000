@@ -5,7 +5,7 @@ export async function sendCommand(msg) {
 		if (msg.osc === undefined) {
 			msg.osc = { xid: this.id }
 		}
-		if (this.socket !== undefined && !this.socket.isDestroyed) {
+		if (this.socket && !this.socket.isDestroyed) {
 			await this.socket
 				.send(JSON.stringify(msg))
 				.then(() => {
@@ -25,7 +25,7 @@ export async function sendCommand(msg) {
 	}
 }
 
-export function init_udp(host, port, interval) {
+export function init_udp(host, port) {
 	if (this.socket) {
 		this.socket.destroy()
 		delete this.socket
@@ -45,7 +45,9 @@ export function init_udp(host, port, interval) {
 			}
 			this.startBlink()
 			this.startFrame()
-			this.startFeedbackChecks(interval)
+			this.startCmdQueue()
+			this.checkDeviceIdentity()
+			this.setupInitialSubscriptions(this.config.device, this.config.interval)
 		})
 
 		this.socket.on('data', (msg) => {

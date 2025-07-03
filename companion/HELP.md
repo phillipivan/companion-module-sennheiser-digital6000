@@ -1,10 +1,10 @@
-## Sennheiser Digital 6000 Radio Microphone System
+# Sennheiser Digital 6000 Radio Microphone System
 
 Control and monitor the EM 6000, EM 6000 Dante and L 6000 via Sennheiser Sound Control Protocol (UDP).
 
-### Actions
+## Actions
 
-#### EM 6000
+### EM 6000
 
 - Antenna Booster
 - Audio Output Level
@@ -17,13 +17,13 @@ Control and monitor the EM 6000, EM 6000 Dante and L 6000 via Sennheiser Sound C
 - Reciever Name
 - Transmitter Sync Settings
 
-#### L 6000
+### L 6000
 
 - Identify
 
-### Feedbacks
+## Feedbacks
 
-#### EM 6000
+### EM 6000
 
 **Advanced Feedbacks**
 
@@ -48,7 +48,7 @@ AF meter (Tri-colour) range -50dBFS to 0dBFS. Includes Signal Presence ( > -100d
 - RF Peak
 - Test Tone Active
 
-#### L 6000
+### L 6000
 
 **Advanced Feedbacks**
 
@@ -60,9 +60,9 @@ AF meter (Tri-colour) range -50dBFS to 0dBFS. Includes Signal Presence ( > -100d
 - Fan Warning
 - Slot Warning
 
-### Variables
+## Variables
 
-#### EM 6000
+### EM 6000
 
 **Device**
 
@@ -102,7 +102,7 @@ AF meter (Tri-colour) range -50dBFS to 0dBFS. Includes Signal Presence ( > -100d
 - Clock
 - Clock Frequency
 
-#### L 6000
+### L 6000
 
 **Device**
 
@@ -130,39 +130,44 @@ AF meter (Tri-colour) range -50dBFS to 0dBFS. Includes Signal Presence ( > -100d
 - Time to Full (H)
 - Time to Full (Min)
 
-### Presets
+## Presets
 
-#### EM 6000
+### EM 6000
 
 - Reciever Status
 
-#### L 6000
+### L 6000
 
 - Battery Status
 - Device Status
 
-### Not Supported
+## Not Supported
 
 The following controls or feedbacks are not supported by the SSC API.
 
-#### EM 6000
+### EM 6000
 
 - Transmission Mode (LR, LD)
 - Command Mode
 - Tx Sync Settings: Name, Power LED Mode, RF Power.
 
-### Release History
+## Release History
 
-#### 1.0.0
+### 1.0.0
 
 Initial Release
 
-#### 1.0.6
+### 1.0.6
 
 Support sequential actions
 
 Use Node 22
 
-#### 1.0.7
+### 1.0.7
 
 Parse local variables
+
+### 1.0.8
+
+Implement message queue priority
+Drop polling messages if message queue is too long

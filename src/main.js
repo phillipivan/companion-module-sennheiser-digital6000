@@ -9,12 +9,13 @@ import * as blink from './blink.js'
 import * as config from './config.js'
 import * as device from './device.js'
 import * as digital6000 from './digital6000.js'
-import * as feedbackChecks from './feedbackChecks.js'
 import * as parseResponse from './parseResponse.js'
 import * as queue from './queue.js'
-import * as statusCheck from './statusCheck.js'
 import * as subscriptions from './subscriptions.js'
 import * as udp from './udp.js'
+import { throttle } from 'lodash'
+
+const THROTTLE_RATE = 40
 
 class Digital6000 extends InstanceBase {
 	constructor(internal) {
@@ -24,17 +25,17 @@ class Digital6000 extends InstanceBase {
 			...config,
 			...device,
 			...digital6000,
-			...feedbackChecks,
 			...parseResponse,
 			...queue,
-			...statusCheck,
 			...subscriptions,
 			...udp,
 		})
 		this.frame = 0
+		this.feedbacksToUpdate = new Set()
 	}
 
 	async init(config) {
+		this.config = config
 		this.currentStatus = {
 			status: 'unknown',
 			label: '',
@@ -68,12 +69,45 @@ class Digital6000 extends InstanceBase {
 		this.updateFeedbacks() // export feedbacks
 		this.updatePresets() // export presets
 		this.updateVariableDefinitions() // export variable definitions
-		this.init_udp(this.config.host, this.config.port, this.config.interval)
-		if (this.socket) {
-			this.startCmdQueue()
-			this.checkDeviceIdentity()
-			this.setupInitialSubscriptions(this.config.device, this.config.interval)
+		this.init_udp(this.config.host, this.config.port)
+	}
+
+	throttledVariableUpdates = throttle(
+		() => {
+			this.updateVariableValues()
+		},
+		THROTTLE_RATE,
+		{ leading: false, trailing: true },
+	)
+
+	throttledFeedbackChecks = throttle(
+		() => {
+			this.checkFeedbacks(...this.feedbacksToUpdate)
+			this.feedbacksToUpdate.clear()
+		},
+		THROTTLE_RATE,
+		{ leading: false, trailing: true },
+	)
+
+	addFeedbacksToQueue(...feedbacks) {
+		for (const fback of feedbacks) {
+			this.feedbacksToUpdate.add(fback)
 		}
+		this.throttledFeedbackChecks()
+		this.throttledVariableUpdates()
+	}
+
+	statusCheck(newStatus, newLabel) {
+		if (this.currentStatus.status === newStatus && this.currentStatus.label === newLabel) {
+			return
+		}
+		this.updateStatus(newStatus, newLabel)
+		this.currentStatus.status = newStatus
+		this.currentStatus.label = newLabel
+	}
+
+	stopFeedbackChecks() {
+		this.feedbacksToUpdate.clear()
 	}
 
 	updateActions() {
